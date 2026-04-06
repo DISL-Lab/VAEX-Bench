@@ -1,0 +1,1642 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <style>
+            pre, code {
+                font-size: 16px;
+            }
+        </style>
+
+        <title>Video Abstractive and Extractive Reasoning Benchmark Leaderboard</title>
+        <link rel="icon" type="image/x-icon" href="./static/img/floor-plan.png">
+
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <!-- JS Libraries -->
+        <script src="./static/js/distill_template.v2.js"></script>
+        <script src="https://d3js.org/d3.v5.min.js"></script>
+
+        <script defer src="./static/js/video-speed.js"></script>
+
+        <!-- Stylesheets -->
+        <link rel="stylesheet" href="./static/css/style.css">
+        <!-- <link rel="stylesheet" href="./static/css/fontawesome.all.min.css"> -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+        
+        <!-- KaTeX -->
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.2/dist/katex.min.css" integrity="sha384-yFRtMMDnQtDRO8rLpMIKrtPCD5jdktao2TV19YiZYWMDkUR5GQZR/NOVTdquEx1j" crossorigin="anonymous">
+        <script defer src="https://cdn.jsdelivr.net/npm/katex@0.10.2/dist/katex.min.js" integrity="sha384-9Nhn55MVVN0/4OFx7EE5kpFBPsEMZxKTCnA+4fqDmg12eCTqGi6+BB2LjY8brQxJ" crossorigin="anonymous"></script>
+        <script defer src="https://cdn.jsdelivr.net/npm/katex@0.10.2/dist/contrib/auto-render.min.js" integrity="sha384-kWPLUVMOks5AQFrykwIup5lo0m3iMkkHrD0uJ4H5cjeGihAutqP0yW0J6dpFiVkI" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script>
+
+        <!-- Medium Zoom -->
+        <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
+        <script defer src="./static/js/medium-zoom.min.js"></script>
+        <script defer src="./static/js/zoom.js"></script>
+
+        <!-- Scenario Button Styles -->
+        <style>
+        .scenario-btn-container {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 8px;
+            margin-bottom: 12px;
+            width: 75%;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .scenario-btn {
+            padding: 7px 16px;
+            border: 2px solid #7aafd6;
+            border-radius: 20px;
+            background-color: #fff;
+            color: #2d3748;
+            font-size: 0.9em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s, color 0.2s;
+        }
+        .scenario-btn:hover {
+            background-color: #5a9bc4;
+            color: #fff;
+        }
+        .scenario-btn.active {
+            background-color: #2e6da4;
+            color: #fff;
+            border-color: #2e6da4;
+        }
+        </style>
+
+        <!-- Leaderboard Styles -->
+        <style>
+        
+        .leaderboard-table {
+            width: 100%;
+            margin-left: 0%;
+            border-collapse: separate;
+            border-spacing: 0;
+            table-layout: fixed;
+            background: #ffffff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            font-size: 14px;
+            margin-bottom: 40px;
+        }
+
+        .leaderboard-table col.model-col {
+            width: 28%;
+        }
+
+        .leaderboard-table col.metric-col {
+            width: 12%;
+        }
+
+        .leaderboard-table col.avg-col {
+            width: 12%;
+        }
+
+        .leaderboard-container {
+            position: relative;
+        }
+
+        .leaderboard-table thead {
+            background: #4a5568;
+            color: white;
+        }
+
+        .leaderboard-table th {
+            padding: 14px 12px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 13px;
+            letter-spacing: 0.025em;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+        }
+
+        .sortable-header {
+            cursor: pointer;
+            user-select: none;
+        }
+        
+        .sortable-header .sort-indicator {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            font-size: 14px;
+            line-height: 1;
+            transform: translateY(-50%);
+            color: #a0aec0;
+        }
+
+        .sortable-header.active .sort-indicator {
+            color: white;
+        }
+        
+        .section-header {
+            background-color: #deeef8;
+            font-weight: 700;
+            color: #2d3748;
+            letter-spacing: 1px;
+            font-size: 18px;
+            text-align: center;
+            padding: 12px !important;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .leaderboard-table td {
+            padding: 12px;
+            border-bottom: 1px solid #e2e8f0;
+            color: #4a5568;
+            text-align: center;
+        }
+        
+        .leaderboard-table tbody tr {
+            transition: background-color 0.15s ease;
+        }
+        
+        .leaderboard-table tbody tr:hover {
+            background-color: #f7fafc;
+        }
+
+        .leaderboard-table td:first-child {
+            font-weight: 600;
+            text-align: left;
+            color: #2d3748;
+            padding-left: 20px;
+        }
+        
+        .leaderboard-table td:nth-child(7) {
+            font-weight: 700;
+            font-size: 15px;
+            color: #2d3748;
+        }
+
+        .leaderboard-viz {
+            width: 80%;
+            margin: 0 auto 16px auto;
+            font-family: 'Segoe UI', Arial, sans-serif;
+        }
+
+        .leaderboard-viz-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 24px;
+        }
+
+        .viz-card {
+            background: linear-gradient(180deg, #ffffff 0%, #f8fbfd 100%);
+            border: 1px solid #dbe7f0;
+            border-radius: 18px;
+            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
+            padding: 18px 22px 10px 22px;
+        }
+
+        .viz-card h3 {
+            margin: 0 0 6px 0;
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: #16202a;
+        }
+
+        .viz-card p {
+            margin: 0 0 12px 0;
+            color: #52606d;
+            font-size: 0.96rem;
+            line-height: 1.55;
+        }
+
+        .viz-scroll {
+            overflow-x: auto;
+            overflow-y: hidden;
+            padding-bottom: 6px;
+        }
+
+        .viz-legend {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 6px;
+            color: #52606d;
+            font-size: 0.9rem;
+        }
+
+        .viz-gradient {
+            width: 180px;
+            height: 10px;
+            border-radius: 999px;
+            background: linear-gradient(90deg, #eef2ff 0%, #93c5fd 45%, #2563eb 100%);
+        }
+
+        .viz-tooltip {
+            position: absolute;
+            pointer-events: none;
+            background: rgba(15, 23, 42, 0.94);
+            color: #ffffff;
+            padding: 10px 12px;
+            border-radius: 10px;
+            font-size: 0.86rem;
+            line-height: 1.45;
+            max-width: 320px;
+            box-shadow: 0 10px 28px rgba(15, 23, 42, 0.22);
+            opacity: 0;
+            transform: translateY(6px);
+            transition: opacity 0.16s ease, transform 0.16s ease;
+            z-index: 20;
+        }
+
+        .viz-note {
+            margin-top: 4px;
+            color: #6b7280;
+            font-size: 0.88rem;
+        }
+        
+        .human-level-row {
+            background: #fffbeb85 !important;
+            font-weight: 600;
+        }
+        
+        .top-performer {
+            background: #f0fdf494 !important;
+        }
+
+        .top-performer td:first-child::before {
+            content: '🥇 ';
+        }
+
+        .model-badge {
+            display: inline-block;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 500;
+            margin-left: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.025em;
+        }
+
+        .proprietary-badge {
+            background: #e2e8f0;
+            color: #475569;
+            border: 1px solid #cbd5e0;
+        }
+
+        .open-badge {
+            background: #e6fffa;
+            color: #047857;
+            border: 1px solid #a7f3d0;
+        }
+        
+        .leaderboard-table tbody tr:nth-child(even) {
+            background-color: #fafafa;
+        }
+        
+        .baseline-row {
+            font-style: italic;
+            opacity: 0.8;
+            background-color: #f9fafb;
+        }
+        
+        .best-score {
+            font-weight: 700;
+            text-decoration: underline;
+            text-decoration-color: #cbd5e0;
+            text-underline-offset: 2px;
+        }
+
+        .section-divider {
+            border-top: 2px solid #e2e8f0;
+        }
+        
+        @media (max-width: 768px) {
+            .leaderboard-container {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                scroll-behavior: smooth;
+                border-radius: 8px;
+                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            }
+            
+            .leaderboard-table {
+                width: 1300px; /* Fixed width to ensure horizontal scrolling */
+                margin-left: 0;
+                font-size: 12px;
+                min-width: 1300px;
+            }
+            
+            .leaderboard-table th,
+            .leaderboard-table td {
+                padding: 8px;
+                white-space: nowrap;
+                min-width: 80px;
+            }
+            
+            .leaderboard-table td:first-child {
+                min-width: 180px;
+                max-width: 180px;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                padding-left: 12px;
+            }
+
+            .leaderboard-viz {
+                width: 92%;
+            }
+
+            /* Add scroll hint for mobile users */
+            .leaderboard-container::after {
+                content: "← Swipe to scroll →";
+                position: absolute;
+                bottom: -25px;
+                left: 50%;
+                transform: translateX(-50%);
+                font-size: 11px;
+                color: #666;
+                font-style: italic;
+                pointer-events: none;
+            }
+        }
+        </style>
+    </head>
+
+    <body>
+        <div class="header-wrapper">
+            <div class="header-container" id="header-container">
+                <div class="header-content" style="width: 100%; text-align: center;">
+                    <!-- <h1 style="margin-top: 0px; text-align: center; color: #f4fbff; text-shadow: 0 0 18px rgba(125, 211, 252, 0.28);"><i>Reasoning over Video:</i></h1> -->
+                    <div class="responsive-header">
+                        <h2 style="text-align: center; color: #8be9ff; text-shadow: 0 0 20px rgba(56, 189, 248, 0.22); font-size: 2.4rem;">Video Abstractive and Extractive Reasoning Benchmark Leaderboard</h2>
+                      </div>
+
+                        <div class="header-authors" style="margin: 20px auto; color: #FEEFC3; line-height: 1.8;">
+                            <!-- <p style="margin: 0 0 6px 0; font-size: 1.05em;">
+                                <a href="https://shwanbang.github.io/" style="color: #ffe099; text-decoration: none;">Seunghwan Bang</a><sup>1,*</sup>&ensp;
+                                <a href="https://songhwanjun.github.io/" style="color: #ffe099; text-decoration: none;">Hwanjun Song</a><sup>2,&dagger;</sup>&ensp;
+                            </p> -->
+                            <!-- <p style="margin: 0 0 4px 0; font-size: 0.92em; opacity: 0.9;">
+                                <sup>1</sup> UNIST &ensp;
+                                <sup>2</sup> KAIST &ensp;
+                            </p>
+                            <p style="margin: 0; font-size: 0.92em; opacity: 0.85;">
+                                <a href="mailto:songhwanjun@kaist.ac.kr" style="color: #ffe099; text-decoration: none;">songhwanjun@kaist.ac.kr</a>
+                            </p>
+                            <p style="margin: 6px 0 0 0; font-size: 0.88em; opacity: 0.8; font-style: italic;">
+                                * This work was done while interning at KAIST. &ensp; &dagger; Corresponding Author
+                            </p> -->
+                            <p style="margin: 14px 0 0 0; text-align: center;">
+                                <span style="display: inline-block; font-size: 1.1em; font-weight: bold; color: #5a4200; letter-spacing: 0.05em; background-color: #ffe099; border-radius: 12px; padding: 6px 24px;">
+                                    Preprint
+                                </span>
+                            </p>
+                        </div>
+                    
+                    
+                        <div class="l-body">
+                            <!-- Scenario Buttons -->
+                            <div class="scenario-btn-container">
+                                <button class="scenario-btn active" onclick="switchScenario(1)">Scenario 1</button>
+                                <button class="scenario-btn" onclick="switchScenario(2)">Scenario 2</button>
+                                <button class="scenario-btn" onclick="switchScenario(3)">Scenario 3</button>
+                                <button class="scenario-btn" onclick="switchScenario(4)">Scenario 4</button>
+                                <button class="scenario-btn" onclick="switchScenario(5)">Scenario 5</button>
+                                <button class="scenario-btn" onclick="switchScenario(6)">Scenario 6</button>
+                                <button class="scenario-btn" onclick="switchScenario(7)">Scenario 7</button>
+                                <button class="scenario-btn" onclick="switchScenario(8)">Scenario 8</button>
+                                <button class="scenario-btn" onclick="switchScenario(9)">Scenario 9</button>
+                                <button class="scenario-btn" onclick="switchScenario(10)">Scenario 10</button>
+                            </div>
+                            <!-- Scenario 1 -->
+                            <div id="Touristvideo1Container" class="video-container">
+                                <video class="video-music" controls preload="metadata" playsinline>
+                                    <source src="static/videos/scenario1.mp4" type="video/mp4">
+                                    Your browser does not support the video tag.
+                                </video>
+                            </div>
+
+                            <!-- Scenario 2 -->
+                            <div id="Touristvideo2Container" class="video-container" style="display:none;">
+                                <video class="video-music" controls preload="metadata" playsinline>
+                                    <source src="static/videos/scenario2.mp4" type="video/mp4">
+                                    Your browser does not support the video tag.
+                                </video>
+                            </div>
+
+                            <!-- Scenario 3 -->
+                            <div id="Touristvideo3Container" class="video-container" style="display:none;">
+                                <video class="video-music" controls preload="metadata" playsinline>
+                                    <source src="static/videos/scenario3.mp4" type="video/mp4">
+                                    Your browser does not support the video tag.
+                                </video>
+                            </div>
+
+                            <!-- Scenario 4 -->
+                            <div id="Touristvideo4Container" class="video-container" style="display:none;">
+                                <video class="video-music" controls preload="metadata" playsinline>
+                                    <source src="static/videos/scenario4.mp4" type="video/mp4">
+                                    Your browser does not support the video tag.
+                                </video>
+                            </div>
+
+                            <!-- Scenario 5 -->
+                            <div id="Touristvideo5Container" class="video-container" style="display:none;">
+                                <video class="video-music" controls preload="metadata" playsinline>
+                                    <source src="static/videos/scenario5.mp4" type="video/mp4">
+                                    Your browser does not support the video tag.
+                                </video>
+                            </div>
+
+                            <!-- Scenario 6 -->
+                            <div id="Touristvideo6Container" class="video-container" style="display:none;">
+                                <video class="video-music" controls preload="metadata" playsinline>
+                                    <source src="static/videos/scenario6.mp4" type="video/mp4">
+                                    Your browser does not support the video tag.
+                                </video>
+                            </div>
+
+                            <!-- Scenario 7 -->
+                            <div id="Touristvideo7Container" class="video-container" style="display:none;">
+                                <video class="video-music" controls preload="metadata" playsinline>
+                                    <source src="static/videos/scenario7.mp4" type="video/mp4">
+                                    Your browser does not support the video tag.
+                                </video>
+                            </div>
+
+                            <!-- Scenario 8 -->
+                            <div id="Touristvideo8Container" class="video-container" style="display:none;">
+                                <video class="video-music" controls preload="metadata" playsinline>
+                                    <source src="static/videos/scenario8.mp4" type="video/mp4">
+                                    Your browser does not support the video tag.
+                                </video>
+                            </div>
+
+                            <!-- Scenario 9 -->
+                            <div id="Touristvideo9Container" class="video-container" style="display:none;">
+                                <video class="video-music" controls preload="metadata" playsinline>
+                                    <source src="static/videos/scenario9.mp4" type="video/mp4">
+                                    Your browser does not support the video tag.
+                                </video>
+                            </div>
+
+                            <!-- Scenario 10 -->
+                            <div id="Touristvideo10Container" class="video-container" style="display:none;">
+                                <video class="video-music" controls preload="metadata" playsinline>
+                                    <source src="static/videos/scenario10.mp4" type="video/mp4">
+                                    Your browser does not support the video tag.
+                                </video>
+                            </div>
+            
+
+                    
+                    <div class="button-container">
+                        <a href="https://arxiv.org/abs/2603.13091" class="button paper-link" target="_blank">
+                            <span class="icon is-small">
+                                <i class="fa-solid fa-file-pdf"></i>
+                            </span>
+                            <span>Paper (ArXiv)</span>
+                        </a>
+                        <div class="button-with-subtext">
+                            <a href="https://github.com/" class="button" target="_blank">
+                                <span class="icon is-small">
+                                    <i class="fa-brands fa-github"></i>
+                                </span>
+                                <span>Code (Github)</span>
+                            </a>
+                            <span class="button-subtext">Coming soon!</span>
+                        </div>
+                        <div class="button-with-subtext">
+                            <a href="https://huggingface.co/" class="button" target="_blank">
+                                <span class="icon is-small">
+                                    <img src="https://huggingface.co/front/assets/huggingface_logo-noborder.svg" alt="Hugging Face logo" style="height: 1em;">
+                                </span>
+                                <span>VAEX-Bench</span>
+                            </a>
+                            <span class="button-subtext">Coming soon!</span>
+                        </div>
+                        <a href="#leaderboard-visualization" class="button">
+                            <span class="icon is-small">
+                                <i class="fa-solid fa-ranking-star"></i>
+                            </span>
+                            <span>Leaderboard</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    <d-article>
+
+
+<script>
+    function switchScenario(num) {
+        const total = 10;
+        for (let i = 1; i <= total; i++) {
+            const container = document.getElementById('Touristvideo' + i + 'Container');
+            if (container) container.style.display = (i === num) ? 'block' : 'none';
+        }
+        document.querySelectorAll('.scenario-btn').forEach((btn, idx) => {
+            btn.classList.toggle('active', idx + 1 === num);
+        });
+    }
+    </script>
+        </div>
+        <div id="leaderboard-visualization" class="leaderboard-viz" style="margin-top: 48px;">
+            <div style="font-size: 1.8em; font-weight: 900; text-align: center; color: #000; margin: 12px 0 16px 0; letter-spacing: 0.04em; font-family: 'Segoe UI', Arial, sans-serif;">Leaderboard Visualization</div>
+            <p style="text-align: left; color: #5b6572; font-size: 1rem; line-height: 1.7; margin: 0 auto 22px auto; max-width: 860px; font-family: 'Source Sans 3', 'Helvetica Neue', Arial, sans-serif;">
+                We visualize model performance across all 10 tasks from abstractive and extractive reasoning to make cross-model strengths and weaknesses easier to compare at a glance.
+            </p>
+            <div class="leaderboard-viz-grid">
+                <div class="viz-card">
+                    <h3>Average Performance by Model</h3>
+                    <p>Each model is compared using its abstractive and extractive averages side by side.</p>
+                    <div class="viz-scroll">
+                        <svg id="avg-comparison-chart"></svg>
+                    </div>
+                    <div class="viz-legend">
+                        <span style="display: inline-flex; align-items: center; gap: 8px;"><span style="width: 12px; height: 12px; border-radius: 999px; background: #2563eb; display: inline-block;"></span>Abstractive Avg.</span>
+                        <span style="display: inline-flex; align-items: center; gap: 8px;"><span style="width: 12px; height: 12px; border-radius: 999px; background: #14b8a6; display: inline-block;"></span>Extractive Avg.</span>
+                    </div>
+                </div>
+                <div class="viz-card">
+                    <h3>Task-Level Heatmap Across 10 Tasks</h3>
+                    <p>Rows correspond to models, and columns correspond to the five abstractive and five extractive tasks.</p>
+                    <div class="viz-scroll">
+                        <svg id="task-heatmap-chart"></svg>
+                    </div>
+                    <div class="viz-legend">
+                        <span>Lower</span>
+                        <span class="viz-gradient"></span>
+                        <span>Higher</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="overview-box" style="margin-top: 48px;">
+            <div class="overview-title" style="font-size: 1.8em; font-weight: 900; text-align: center; color: #000; margin-bottom: 16px; letter-spacing: 0.04em; font-family: 'Segoe UI', Arial, sans-serif;">Overview</div>
+            <d-figure id="fig-teaser" layout="l-page">
+                <figure>
+                    <img data-zoomable="" draggable="false" src="static/img/teaser.png" alt="Visual-Spatial Intelligence Teaser" style="width: 100%; max-width: 100%; display: block;">
+                    <figcaption>
+                        <strong>Figure 1:</strong> Two examples of abstractive spatiotemporal queries from VAEX-BENCH: (Left) Global Counting, requiring aggregation of objects observed across the traversal; (Right) Map Direction, requiring inference of relative spatial directions between rooms.
+                    </figcaption>
+                </figure>
+            </d-figure>
+        </div>
+
+    
+        <div style="font-size: 1.8em; font-weight: 900; text-align: center; color: #000; margin: 36px 0 16px 0; letter-spacing: 0.04em; font-family: 'Segoe UI', Arial, sans-serif;">Abstract</div>
+        <p class="text abstract">
+            The growing interest in embodied agents increases the demand for spatiotemporal video understanding, yet existing benchmarks largely emphasize extractive reasoning, where answers can be explicitly presented within spatiotemporal events. 
+            It remains unclear whether multimodal large language models can instead perform abstractive spatiotemporal reasoning, which requires integrating observations over time, combining dispersed cues, and inferring implicit spatial and contextual structure. 
+            To address this gap, we formalize abstractive spatiotemporal reasoning from videos by introducing a structured evaluation taxonomy that systematically targets its core dimensions and construct a controllable, scenario-driven synthetic egocentric video dataset tailored to evaluate abstractive spatiotemporal reasoning capabilities, spanning object-, room-, and floor-plan–level scenarios. 
+            Based on this framework, we present <span style="font-weight: 900; color: #2e6da4; font-family: 'Segoe UI', Arial, sans-serif; letter-spacing: 0.02em;">VAEX-BENCH</span>, a benchmark comprising five abstractive reasoning tasks together with their extractive counterparts. 
+            Our extensive experiments compare the performance of state-of-the-art MLLMs under extractive and abstractive settings, exposing their limitations on abstractive tasks and providing a fine-grained analysis of the underlying bottlenecks. The dataset will be released soon.
+            <br>
+        </p>
+        
+        <div style="font-size: 1.8em; font-weight: 900; text-align: center; color: #000; margin: 36px 0 16px 0; letter-spacing: 0.04em; font-family: 'Segoe UI', Arial, sans-serif;">Key Points</div>
+        <div class="key-points-wrap" style="width: 80%; margin: 0 auto 28px auto;">
+            <div class="key-points-box" style="border: 2px solid #b0c8e0; border-radius: 18px; background-color: #f5f9fd; padding: 18px 22px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06); box-sizing: border-box;">
+                <ul style="margin: 0; padding-left: 22px; width: 100%; font-size: 1.2rem; line-height: 1.6; color: #333333;">
+                    <li>We introduce VAEX-Bench, a scenario-driven synthetic dataset and taxonomy for abstractive spatiotemporal reasoning from videos.</li>
+                    <li>VAEX-Bench includes five abstractive reasoning tasks with extractive counterparts to enable controlled comparisons.</li>
+                    <li>Extensive experiments reveal limitations of current state-of-the-art MLLMs on abstractive tasks and analyze the underlying bottlenecks.</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- <div style="font-size: 1.8em; font-weight: 900; text-align: center; color: #000; margin: 36px 0 16px 0; letter-spacing: 0.04em; font-family: 'Segoe UI', Arial, sans-serif;">VAEX-BENCH</div> -->
+
+        <div style="font-size: 1.8em; font-weight: 900; text-align: center; color: #000; margin: 36px 0 16px 0; letter-spacing: 0.04em; font-family: 'Segoe UI', Arial, sans-serif;">Evaluation</div>
+        <div id="vsi-leaderboard" class="leaderboard-container" style="width: 80%; margin: 0 auto 48px auto;">
+            <div style="font-size: 1.15rem; font-weight: 800; color: #1f2937; margin: 0 0 12px 0; text-align: left; font-family: 'Segoe UI', Arial, sans-serif;">Abstractive Reasoning Evaluation</div>
+            <!-- <p style="text-align: center; color: #5b6572; font-size: 1.02rem; line-height: 1.6; margin: 0 auto 20px auto; max-width: 760px; font-family: 'Source Sans 3', 'Helvetica Neue', Arial, sans-serif;">
+                Quantitative results on VAEX-BENCH across representative open and proprietary MLLMs.
+                Click a column header to sort the table.
+            </p> -->
+            <table id="abstractive-leaderboard" class="leaderboard-table">
+                <colgroup>
+                    <col class="model-col">
+                    <col class="metric-col">
+                    <col class="metric-col">
+                    <col class="metric-col">
+                    <col class="metric-col">
+                    <col class="metric-col">
+                    <col class="avg-col">
+                </colgroup>
+                <thead>
+                    <tr>
+                        <th data-column-index="0">Model</th>
+                        <th data-column-index="1">Memory-Action</th>
+                        <th data-column-index="2">Map Direction</th>
+                        <th data-column-index="3">Map Scale</th>
+                        <th data-column-index="4">Simulation</th>
+                        <th data-column-index="5">Global Counting</th>
+                        <th data-column-index="6">Avg.</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>GPT-5.2 <span class="model-badge proprietary-badge">Closed</span></td>
+                        <td>38.0</td>
+                        <td>26.0</td>
+                        <td>34.0</td>
+                        <td>29.3</td>
+                        <td>23.3</td>
+                        <td>30.1</td>
+                    </tr>
+                    <tr class="top-performer">
+                        <td>Gemini-3 Flash <span class="model-badge proprietary-badge">Closed</span></td>
+                        <td>60.7</td>
+                        <td>34.0</td>
+                        <td>24.0</td>
+                        <td>51.3</td>
+                        <td>31.3</td>
+                        <td class="best-score">40.3</td>
+                    </tr>
+                    <tr>
+                        <td>Gemini-3 Pro <span class="model-badge proprietary-badge">Closed</span></td>
+                        <td>52.0</td>
+                        <td>22.7</td>
+                        <td>22.0</td>
+                        <td>31.3</td>
+                        <td>20.7</td>
+                        <td>29.7</td>
+                    </tr>
+                    <tr>
+                        <td>Claude 4.5 Haiku <span class="model-badge proprietary-badge">Closed</span></td>
+                        <td>19.3</td>
+                        <td>21.3</td>
+                        <td>11.3</td>
+                        <td>22.0</td>
+                        <td>2.7</td>
+                        <td>15.3</td>
+                    </tr>
+                    <tr>
+                        <td>Claude 4.5 Sonnet <span class="model-badge proprietary-badge">Closed</span></td>
+                        <td>30.0</td>
+                        <td>19.3</td>
+                        <td>19.3</td>
+                        <td>40.7</td>
+                        <td>11.3</td>
+                        <td>24.1</td>
+                    </tr>
+                    <tr>
+                        <td>Qwen3-VL-2B <span class="model-badge open-badge">Open</span></td>
+                        <td>26.0</td>
+                        <td>18.7</td>
+                        <td>19.3</td>
+                        <td>26.0</td>
+                        <td>6.7</td>
+                        <td>19.3</td>
+                    </tr>
+                    <tr>
+                        <td>Qwen3-VL-8B <span class="model-badge open-badge">Open</span></td>
+                        <td>34.0</td>
+                        <td>22.0</td>
+                        <td>15.3</td>
+                        <td>34.0</td>
+                        <td>17.3</td>
+                        <td>24.5</td>
+                    </tr>
+                    <tr>
+                        <td>Qwen3-VL-32B <span class="model-badge open-badge">Open</span></td>
+                        <td>40.0</td>
+                        <td>26.0</td>
+                        <td>23.3</td>
+                        <td>42.7</td>
+                        <td>17.3</td>
+                        <td>29.9</td>
+                    </tr>
+                    <tr>
+                        <td>Qwen3-VL-235B <span class="model-badge open-badge">Open</span></td>
+                        <td>43.3</td>
+                        <td>16.7</td>
+                        <td>13.3</td>
+                        <td>46.7</td>
+                        <td>13.3</td>
+                        <td>26.7</td>
+                    </tr>
+                    <tr>
+                        <td>InternVL3.5-2B <span class="model-badge open-badge">Open</span></td>
+                        <td>28.0</td>
+                        <td>22.7</td>
+                        <td>20.0</td>
+                        <td>21.3</td>
+                        <td>14.0</td>
+                        <td>21.2</td>
+                    </tr>
+                    <tr>
+                        <td>InternVL3.5-8B <span class="model-badge open-badge">Open</span></td>
+                        <td>36.7</td>
+                        <td>24.0</td>
+                        <td>21.3</td>
+                        <td>26.0</td>
+                        <td>16.0</td>
+                        <td>24.8</td>
+                    </tr>
+                    <tr>
+                        <td>Mistral-3.2-24B <span class="model-badge open-badge">Open</span></td>
+                        <td>28.7</td>
+                        <td>16.7</td>
+                        <td>10.0</td>
+                        <td>18.7</td>
+                        <td>14.0</td>
+                        <td>17.6</td>
+                    </tr>
+                    <tr>
+                        <td>Gemma-3-27B <span class="model-badge open-badge">Open</span></td>
+                        <td>32.0</td>
+                        <td>24.0</td>
+                        <td>23.3</td>
+                        <td>28.7</td>
+                        <td>10.7</td>
+                        <td>23.7</td>
+                    </tr>
+                    <tr>
+                        <td>GLM-4.6V-106B <span class="model-badge open-badge">Open</span></td>
+                        <td>35.3</td>
+                        <td>18.0</td>
+                        <td>20.7</td>
+                        <td>37.3</td>
+                        <td>6.0</td>
+                        <td>23.5</td>
+                    </tr>
+                    <tr class="human-level-row">
+                        <td>Random</td>
+                        <td>30.7</td>
+                        <td>22.0</td>
+                        <td>18.0</td>
+                        <td>35.3</td>
+                        <td>-</td>
+                        <td>26.5</td>
+                    </tr>
+                    <tr class="human-level-row">
+                        <td>Human Performance</td>
+                        <td>89.3</td>
+                        <td>83.3</td>
+                        <td>60.0</td>
+                        <td>93.3</td>
+                        <td>82.7</td>
+                        <td>81.7</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div style="font-size: 1.15rem; font-weight: 800; color: #1f2937; margin: 0 0 12px 0; text-align: left; font-family: 'Segoe UI', Arial, sans-serif;">Extractive Reasoning Evaluation</div>
+            <!-- <p style="text-align: center; color: #5b6572; font-size: 1.02rem; line-height: 1.6; margin: 0 auto 20px auto; max-width: 760px; font-family: 'Source Sans 3', 'Helvetica Neue', Arial, sans-serif;">
+                Quantitative results on VAEX-BENCH across representative open and proprietary MLLMs.
+                Click a column header to sort the table.
+            </p> -->
+            <table id="extractive-leaderboard" class="leaderboard-table">
+                <colgroup>
+                    <col class="model-col">
+                    <col class="metric-col">
+                    <col class="metric-col">
+                    <col class="metric-col">
+                    <col class="metric-col">
+                    <col class="metric-col">
+                    <col class="avg-col">
+                </colgroup>
+                <thead>
+                    <tr>
+                        <th data-column-index="0">Model</th>
+                        <th data-column-index="1">Appearance Order</th>
+                        <th data-column-index="2">Relative Direction</th>
+                        <th data-column-index="3">Relative Distance</th>
+                        <th data-column-index="4">Route plan</th>
+                        <th data-column-index="5">Object Counting</th>
+                        <th data-column-index="6">Avg.</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>GPT-5.2 <span class="model-badge proprietary-badge">Closed</span></td>
+                        <td>73.3</td>
+                        <td>26.0</td>
+                        <td>56.0</td>
+                        <td>18.7</td>
+                        <td>48.7</td>
+                        <td>44.5</td>
+                    </tr>
+                    <tr>
+                        <td>Gemini-3 Flash <span class="model-badge proprietary-badge">Closed</span></td>
+                        <td>93.3</td>
+                        <td>40.0</td>
+                        <td>62.7</td>
+                        <td>16.0</td>
+                        <td>38.0</td>
+                        <td>50.0</td>
+                    </tr>
+                    <tr class="top-performer">
+                        <td>Gemini-3 Pro <span class="model-badge proprietary-badge">Closed</span></td>
+                        <td>96.0</td>
+                        <td>44.7</td>
+                        <td>66.7</td>
+                        <td>26.0</td>
+                        <td>44.7</td>
+                        <td class="best-score">55.6</td>
+                    </tr>
+                    <tr>
+                        <td>Claude 4.5 Haiku <span class="model-badge proprietary-badge">Closed</span></td>
+                        <td>34.0</td>
+                        <td>30.0</td>
+                        <td>26.7</td>
+                        <td>30.0</td>
+                        <td>40.0</td>
+                        <td>32.1</td>
+                    </tr>
+                    <tr>
+                        <td>Claude 4.5 Sonnet <span class="model-badge proprietary-badge">Closed</span></td>
+                        <td>72.7</td>
+                        <td>24.7</td>
+                        <td>28.0</td>
+                        <td>13.3</td>
+                        <td>30.7</td>
+                        <td>33.9</td>
+                    </tr>
+                    <tr>
+                        <td>Qwen3-VL-2B <span class="model-badge open-badge">Open</span></td>
+                        <td>82.0</td>
+                        <td>29.3</td>
+                        <td>42.7</td>
+                        <td>22.7</td>
+                        <td>40.0</td>
+                        <td>43.3</td>
+                    </tr>
+                    <tr>
+                        <td>Qwen3-VL-8B <span class="model-badge open-badge">Open</span></td>
+                        <td>80.0</td>
+                        <td>33.3</td>
+                        <td>54.0</td>
+                        <td>25.3</td>
+                        <td>34.0</td>
+                        <td>45.3</td>
+                    </tr>
+                    <tr>
+                        <td>Qwen3-VL-32B <span class="model-badge open-badge">Open</span></td>
+                        <td>90.0</td>
+                        <td>26.0</td>
+                        <td>53.3</td>
+                        <td>6.7</td>
+                        <td>51.3</td>
+                        <td>45.5</td>
+                    </tr>
+                    <tr>
+                        <td>Qwen3-VL-235B <span class="model-badge open-badge">Open</span></td>
+                        <td>93.3</td>
+                        <td>38.0</td>
+                        <td>54.0</td>
+                        <td>20.0</td>
+                        <td>43.3</td>
+                        <td>49.7</td>
+                    </tr>
+                    <tr>
+                        <td>InternVL3.5-2B <span class="model-badge open-badge">Open</span></td>
+                        <td>64.0</td>
+                        <td>30.7</td>
+                        <td>36.7</td>
+                        <td>20.0</td>
+                        <td>30.7</td>
+                        <td>36.4</td>
+                    </tr>
+                    <tr>
+                        <td>InternVL3.5-8B <span class="model-badge open-badge">Open</span></td>
+                        <td>73.3</td>
+                        <td>28.7</td>
+                        <td>36.0</td>
+                        <td>20.7</td>
+                        <td>32.0</td>
+                        <td>38.1</td>
+                    </tr>
+                    <tr>
+                        <td>Mistral-3.2-24B <span class="model-badge open-badge">Open</span></td>
+                        <td>28.7</td>
+                        <td>28.0</td>
+                        <td>40.0</td>
+                        <td>17.3</td>
+                        <td>40.7</td>
+                        <td>30.9</td>
+                    </tr>
+                    <tr>
+                        <td>Gemma-3-27B <span class="model-badge open-badge">Open</span></td>
+                        <td>55.3</td>
+                        <td>33.3</td>
+                        <td>28.0</td>
+                        <td>28.7</td>
+                        <td>49.3</td>
+                        <td>38.9</td>
+                    </tr>
+                    <tr>
+                        <td>GLM-4.6V-106B <span class="model-badge open-badge">Open</span></td>
+                        <td>85.3</td>
+                        <td>29.3</td>
+                        <td>58.4</td>
+                        <td>10.0</td>
+                        <td>52.0</td>
+                        <td>46.9</td>
+                    </tr>
+                    <tr class="human-level-row">
+                        <td>Random</td>
+                        <td>15.3</td>
+                        <td>22.0</td>
+                        <td>42.0</td>
+                        <td>20.0</td>
+                        <td>-</td>
+                        <td>24.8</td>
+                    </tr>
+                    <tr class="human-level-row">
+                        <td>Human Performance</td>
+                        <td>93.3</td>
+                        <td>88.0</td>
+                        <td>77.3</td>
+                        <td>88.7</td>
+                        <td>92.7</td>
+                        <td>88.0</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div style="font-size: 1.8em; font-weight: 900; text-align: center; color: #000; margin: 36px 0 16px 0; letter-spacing: 0.04em; font-family: 'Segoe UI', Arial, sans-serif;">Detailed Analysis</div>
+        <div style="width: 80%; margin: 0 auto; font-family: 'Segoe UI', Arial, sans-serif; line-height: 1.6;">
+
+            <div style="margin-bottom: 60px;">
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
+                    <span style="background: #000; color: #fff; padding: 2px 8px; font-size: 0.8em; font-weight: 900; border-radius: 3px;">01</span>
+                    <h3 style="margin: 0; font-size: 1.4em; color: #000; letter-spacing: -0.01em;">Perceptual Bottleneck</h3>
+                </div>
+                <p style="color: #444; font-size: 1.05em; margin-bottom: 20px;">
+                    We analyze failures on 
+                    <span style="display: inline-block; background-color: #f0f0f0; color: #2e6da4; padding: 2px 10px; border-radius: 10px; font-weight: 700; border: 1px solid #ddd; margin: 0 4px; vertical-align: middle;">
+                        Global Counting
+                    </span>, 
+                    requiring models to detect and track object instances before aggregating them into global counts. To obtain a granular view of model failures, we decompose errors into three mutually exclusive categories:
+                </p>
+                <div style="margin-top: 24px; font-family: 'Segoe UI', Arial, sans-serif;">
+    
+                    <div style="display: flex; align-items: flex-start; margin-bottom: 16px; padding: 12px; border-left: 4px solid #000; background-color: #fafafa;">
+                        <span style="font-weight: 900; color: #000; margin-right: 15px; font-size: 1.1em;">01.</span>
+                        <div>
+                            <strong style="display: block; font-size: 1.1em; color: #000; margin-bottom: 4px;">Omission Error</strong>
+                            <span style="color: #666; font-size: 0.95em;">An error in which an object that is actually present in the scenario is incorrectly judged as absent and therefore not counted.</span>
+                        </div>
+                    </div>
+                
+                    <div style="display: flex; align-items: flex-start; margin-bottom: 16px; padding: 12px; border-left: 4px solid #444; background-color: #fafafa;">
+                        <span style="font-weight: 900; color: #000; margin-right: 15px; font-size: 1.1em;">02.</span>
+                        <div>
+                            <strong style="display: block; font-size: 1.1em; color: #000; margin-bottom: 4px;">Hallucination Error</strong>
+                            <span style="color: #666; font-size: 0.95em;">An error in which an object that does not actually exist in the scenario is incorrectly judged to be present and is therefore included in the count.</span>
+                        </div>
+                    </div>
+                
+                    <div style="display: flex; align-items: flex-start; margin-bottom: 16px; padding: 12px; border-left: 4px solid #888; background-color: #fafafa;">
+                        <span style="font-weight: 900; color: #000; margin-right: 15px; font-size: 1.1em;">03.</span>
+                        <div>
+                            <strong style="display: block; font-size: 1.1em; color: #000; margin-bottom: 4px;">Miscounting Error</strong>
+                            <span style="color: #666; font-size: 0.95em;">An error in which an object is correclty recognized as being present in the scenario, but the number assigned to that object is incorrect.</span>
+                        </div>
+                    </div>
+                
+                </div>
+
+                </p>
+                <figure style="width: 70%; margin: 20px auto; background: #f9f9f9; border: 1px solid #eee; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.03);">
+                    <img src="static/img/perceptual.jpg" alt="Bottleneck Analysis 1" style="width: 100%; display: block;">
+                    
+                    <figcaption style="padding: 15px; text-align: center; font-size: 16px; color: #666; font-family: 'Inter', sans-serif; line-height: 1.5; border-top: 1px solid #eee; background: #fff;">
+                        <strong style="color: #333;">Figure 2.</strong> Error breakdown for the Global Counting task.
+                    </figcaption>
+                </figure>
+            </div>
+        
+            <hr style="border: 0; border-top: 1px dashed #ddd; margin-bottom: 60px;">
+        
+            <div style="margin-bottom: 60px;">
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
+                    <span style="background: #000; color: #fff; padding: 2px 8px; font-size: 0.8em; font-weight: 900; border-radius: 3px;">02</span>
+                    <h3 style="margin: 0; font-size: 1.4em; color: #000; letter-spacing: -0.01em;">Temporal Bottleneck</h3>
+                </div>
+                <p style="color: #444; font-size: 1.05em; margin-bottom: 20px;">
+                    We analyze failures on 
+                    <span style="display: inline-block; background-color: #f0f0f0; color: #2e6da4; padding: 2px 10px; border-radius: 10px; font-weight: 700; border: 1px solid #ddd; margin: 0 4px; vertical-align: middle;">
+                        Memory-Action
+                    </span>, 
+                    requiring models to recall the sequence of visited rooms along the trajectory and use that temporal memory to identify the correct action associated with a target location.
+                    To disentangle different sources of failure, we perform a fine-grained error analysis along two hierarchical components:
+                </p>
+
+                <div style="display: flex; justify-content: center; gap: 30px; margin-bottom: 40px; font-family: 'Inter', sans-serif;">
+    
+                    <div style="flex: 1; max-width: 300px; text-align: center;">
+                        <div style="padding: 12px; background: #eef2ff; color: #4338ca; border: 1px solid #c7d2fe; border-radius: 10px; font-weight: 700; margin-bottom: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+                            Global Temporal Memory <span style="font-size: 0.8em; opacity: 0.7;">(Hop 1)</span>
+                        </div>
+                        <div style="font-size: 0.9em; line-height: 1.5; color: #555;">
+                            <div style="margin-bottom: 4px;"><span style="color: #059669; font-weight: 700;">● Pass:</span> Recalls the full trajectory.</div>
+                            <div><span style="color: #dc2626; font-weight: 700;">● Fail:</span> Forgets the sequence of rooms.</div>
+                        </div>
+                    </div>
+                
+                    <div style="flex: 1; max-width: 300px; text-align: center;">
+                        <div style="padding: 12px; background: #f0fdf4; color: #15803d; border: 1px solid #bbf7d0; border-radius: 10px; font-weight: 700; margin-bottom: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+                            Local Temporal Memory <span style="font-size: 0.8em; opacity: 0.7;">(Hop 2)</span>
+                        </div>
+                        <div style="font-size: 0.9em; line-height: 1.5; color: #555;">
+                            <div style="margin-bottom: 4px;"><span style="color: #059669; font-weight: 700;">● Pass:</span> Matches action to target.</div>
+                            <div><span style="color: #dc2626; font-weight: 700;">● Fail:</span> Fails to link memory to action.</div>
+                        </div>
+                    </div>
+                
+                </div>
+
+                <figure style="width: 70%; margin: 20px auto; background: #f9f9f9; border: 1px solid #eee; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.03);">
+                    <img src="static/img/temporal.jpg" alt="Bottleneck Analysis 1" style="width: 100%; display: block;">
+                    
+                    <figcaption style="padding: 15px; text-align: center; font-size: 16px; color: #666; font-family: 'Inter', sans-serif; line-height: 1.5; border-top: 1px solid #eee; background: #fff;">
+                        <strong style="color: #333;">Figure 3.</strong> 
+                    </figcaption>
+                </figure>
+            </div>
+        
+            <hr style="border: 0; border-top: 1px dashed #ddd; margin-bottom: 60px;">
+        
+            <div style="margin-bottom: 40px;">
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
+                    <span style="background: #000; color: #fff; padding: 2px 8px; font-size: 0.8em; font-weight: 900; border-radius: 3px;">03</span>
+                    <h3 style="margin: 0; font-size: 1.4em; color: #000; letter-spacing: -0.01em;">Spatial Bottleneck</h3>
+                </div>
+                <p style="color: #444; font-size: 1.05em; margin-bottom: 20px;">
+                    We analyze failures on 
+                    <span style="display: inline-block; background-color: #f0f0f0; color: #2e6da4; padding: 2px 10px; border-radius: 10px; font-weight: 700; border: 1px solid #ddd; margin: 0 4px; vertical-align: middle;">
+                        Map Direction
+                    </span>,
+                    <span style="display: inline-block; background-color: #f0f0f0; color: #2e6da4; padding: 2px 10px; border-radius: 10px; font-weight: 700; border: 1px solid #ddd; margin: 0 4px; vertical-align: middle;">
+                        Map Scale
+                    </span>, 
+                    <span style="display: inline-block; background-color: #f0f0f0; color: #2e6da4; padding: 2px 10px; border-radius: 10px; font-weight: 700; border: 1px solid #ddd; margin: 0 4px; vertical-align: middle;">
+                        Simulation
+                    </span>, 
+                    requiring a coherent spatial representation of the environment.
+                    Models must reason about relative room orientation, maintain consistent metric proportions, and simulate viewpoint transformations within a unified layout.
+                    To diagnose these spatial bottlenecks, we evaluate the MLLMs to explicitly reconstruct a global cognitive map via grid-based floor-plan prediciton.
+                </p>
+                <figure style="width: 70%; margin: 20px auto; background: #f9f9f9; border: 1px solid #eee; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.03);">
+                    <img src="static/img/spatial.jpg" alt="Bottleneck Analysis 1" style="width: 100%; display: block;">
+                    
+                    <figcaption style="padding: 15px; text-align: center; font-size: 16px; color: #666; font-family: 'Inter', sans-serif; line-height: 1.5; border-top: 1px solid #eee; background: #fff;">
+                        <strong style="color: #333;">Figure 4.</strong> Visualization of an MLLM floor-plan prediction.
+                    </figcaption>
+                </figure>
+            </div>
+        
+        </div>
+
+
+
+
+        <div style="font-size: 1.8em; font-weight: 900; text-align: center; color: #000; margin: 36px 0 16px 0; letter-spacing: 0.04em; font-family: 'Segoe UI', Arial, sans-serif;">Conclusion</div>
+        <p class="text conclusion">
+            We present VAEX-BENCH, a scenario-driven benchmark for evaluating abstractive and extractive spatiotemporal reasoning in egocentric videos, moving beyond evidence-present extraction toward long-horizon memory, allocentric map reasoning, and global evidence aggregation. 
+            Unlike prior benchmarks built on fixed captured footage, VAEX-BENCH is manually constructed with controlled scenario design and spatially consistent QA pairs, enabling precise diagnosis of failure modes. 
+            Our experiments reveal persistent bottlenecks in global spatial memory and structured evidence integration across state-of-the-art MLLMs. 
+            Future work will focus on automating the pipeline to scale benchmark generation while preserving its controllability.
+            <br>
+        </p>
+        <div style="width: 80%; margin: 28px auto 0 auto; text-align: left; font-family: 'Segoe UI', Arial, sans-serif;">
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 10px;">
+                <div style="font-size: 1.2rem; font-weight: 800; color: #1f2937;">BibTeX</div>
+                <button id="copy-bibtex-button" type="button" style="border: 1px solid #cbd5e1; background: #ffffff; color: #334155; border-radius: 999px; padding: 7px 14px; font-size: 0.9rem; font-weight: 700; cursor: pointer;">Copy</button>
+            </div>
+            <pre id="bibtex-block" style="margin: 0; padding: 18px 20px; border-radius: 14px; background: #f8fafc; border: 1px solid #dbe7f0; color: #1f2937; font-size: 0.98rem; line-height: 1.65; text-align: left; white-space: pre-wrap;">@article{bang2026reasoning,
+  title={Reasoning over Video: Evaluating How MLLMs Extract, Integrate, and Reconstruct Spatiotemporal Evidence},
+  author={Bang, Seunghwan and Song, Hwanjun},
+  journal={arXiv preprint arXiv:2603.13091},
+  year={2026}
+}</pre>
+        </div>
+    </div>
+
+        <!-- </d-article>
+        
+        <d-appendix>
+
+            
+        </d-appendix>  
+        <d-bibliography src="bibliography.bib"></d-bibliography>
+        <script src="/static/js/nav-bar.js"></script> -->
+
+<!-- Leaderboard Sorting JavaScript -->
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const tables = document.querySelectorAll('.leaderboard-table');
+    if (!tables.length) return;
+
+    // Generic comparison function for sorting. Handles strings and numbers.
+    function compareValues(valA, valB, index) {
+        if (index === 0) {
+            return valA.localeCompare(valB);
+        }
+
+        const numA = parseFloat(valA);
+        const numB = parseFloat(valB);
+        const isNumA = !isNaN(numA);
+        const isNumB = !isNaN(numB);
+
+        if (isNumA && isNumB) return numA - numB;
+        if (isNumA) return 1;
+        if (isNumB) return -1;
+        return 0;
+    }
+
+    function getModelName(cell) {
+        const cellClone = cell.cloneNode(true);
+        cellClone.querySelectorAll('.model-badge').forEach(badge => badge.remove());
+        return cellClone.textContent.trim();
+    }
+
+    function getModelGroup(row) {
+        const modelCell = row.children[0];
+        if (!modelCell) return 4;
+
+        const modelName = getModelName(modelCell);
+        if (modelName === 'Random') return 0;
+        if (modelName === 'Human Performance') return 1;
+        if (modelCell.querySelector('.proprietary-badge')) return 2;
+        if (modelCell.querySelector('.open-badge')) return 3;
+        return 4;
+    }
+
+    function parseModelSortInfo(modelName) {
+        const match = modelName.match(/^(.*?)-(\d+(?:\.\d+)?)([BM])$/i);
+        if (!match) {
+            return {
+                baseName: modelName,
+                sizeValue: null,
+                fullName: modelName
+            };
+        }
+
+        const numericValue = parseFloat(match[2]);
+        const unit = match[3].toUpperCase();
+        const sizeValue = unit === 'B' ? numericValue * 1e9 : numericValue * 1e6;
+
+        return {
+            baseName: match[1],
+            sizeValue: sizeValue,
+            fullName: modelName
+        };
+    }
+
+    function compareParsedModelNames(modelNameA, modelNameB) {
+        const parsedA = parseModelSortInfo(modelNameA);
+        const parsedB = parseModelSortInfo(modelNameB);
+
+        const baseDiff = parsedA.baseName.localeCompare(parsedB.baseName);
+        if (baseDiff !== 0) return baseDiff;
+
+        if (parsedA.sizeValue != null && parsedB.sizeValue != null && parsedA.sizeValue !== parsedB.sizeValue) {
+            return parsedA.sizeValue - parsedB.sizeValue;
+        }
+
+        if (parsedA.sizeValue != null && parsedB.sizeValue == null) return 1;
+        if (parsedA.sizeValue == null && parsedB.sizeValue != null) return -1;
+        return parsedA.fullName.localeCompare(parsedB.fullName);
+    }
+
+    function compareModelRows(rowA, rowB) {
+        const groupDiff = getModelGroup(rowA) - getModelGroup(rowB);
+        if (groupDiff !== 0) return groupDiff;
+
+        const modelNameA = getModelName(rowA.children[0]);
+        const modelNameB = getModelName(rowB.children[0]);
+        return compareParsedModelNames(modelNameA, modelNameB);
+    }
+
+    tables.forEach(table => {
+        const thead = table.querySelector('thead');
+        const tbody = table.querySelector('tbody');
+        if (!thead || !tbody) return;
+
+        const headers = thead.querySelectorAll('th[data-column-index]');
+        if (!headers.length) return;
+
+        let sortConfig = {
+            columnIndex: 0,
+            direction: 'asc'
+        };
+
+        function updateSortIndicators() {
+            headers.forEach(h => {
+                const indicator = h.querySelector('.sort-indicator');
+                if (!indicator) return;
+
+                const hIndex = parseInt(h.dataset.columnIndex, 10);
+                if (hIndex === sortConfig.columnIndex) {
+                    indicator.textContent = sortConfig.direction === 'asc' ? '▲' : '▼';
+                    h.classList.add('active');
+                } else {
+                    indicator.textContent = '';
+                    h.classList.remove('active');
+                }
+            });
+        }
+
+        function sortTable() {
+            const rows = Array.from(tbody.querySelectorAll('tr'));
+            const sortableRows = rows.filter(row =>
+                !row.classList.contains('baseline-row') &&
+                !row.classList.contains('section-divider') &&
+                !row.classList.contains('section-header') &&
+                (sortConfig.columnIndex === 0 || !row.classList.contains('human-level-row'))
+            );
+
+            const direction = sortConfig.direction === 'asc' ? 1 : -1;
+
+            if (sortConfig.columnIndex === 0) {
+                sortableRows.sort((rowA, rowB) => compareModelRows(rowA, rowB) * direction);
+            } else {
+                sortableRows.sort((rowA, rowB) => {
+                    const cellA = rowA.children[sortConfig.columnIndex].textContent.trim();
+                    const cellB = rowB.children[sortConfig.columnIndex].textContent.trim();
+                    return compareValues(cellA, cellB, sortConfig.columnIndex) * direction;
+                });
+            }
+
+            sortableRows.forEach(row => tbody.appendChild(row));
+            updateSortIndicators();
+        }
+
+        headers.forEach(header => {
+            header.classList.add('sortable-header');
+
+            let indicator = header.querySelector('.sort-indicator');
+            if (!indicator) {
+                indicator = document.createElement('span');
+                indicator.className = 'sort-indicator';
+                header.appendChild(indicator);
+            }
+
+            header.addEventListener('click', () => {
+                const columnIndex = parseInt(header.dataset.columnIndex, 10);
+                if (sortConfig.columnIndex === columnIndex) {
+                    sortConfig.direction = sortConfig.direction === 'asc' ? 'desc' : 'asc';
+                } else {
+                    sortConfig.columnIndex = columnIndex;
+                    sortConfig.direction = 'desc';
+                }
+                sortTable();
+            });
+        });
+
+        sortTable();
+    });
+
+    function getTableModelName(cell) {
+        const cellClone = cell.cloneNode(true);
+        cellClone.querySelectorAll('.model-badge').forEach(badge => badge.remove());
+        return cellClone.textContent.trim();
+    }
+
+    function getModelType(cell, modelName) {
+        if (modelName === 'Random') return 'random';
+        if (modelName === 'Human Performance') return 'human';
+        if (cell.querySelector('.proprietary-badge')) return 'closed';
+        if (cell.querySelector('.open-badge')) return 'open';
+        return 'other';
+    }
+
+    function compareModelEntries(a, b) {
+        const orderMap = {
+            random: 0,
+            human: 1,
+            closed: 2,
+            open: 3,
+            other: 4
+        };
+
+        const groupDiff = orderMap[a.type] - orderMap[b.type];
+        if (groupDiff !== 0) return groupDiff;
+        return compareParsedModelNames(a.name, b.name);
+    }
+
+    function parseLeaderboardTable(tableId, prefix) {
+        const table = document.getElementById(tableId);
+        if (!table) return { tasks: [], rows: [] };
+
+        const headers = Array.from(table.querySelectorAll('thead th')).map((th, index) => ({
+            index: index,
+            label: th.textContent.trim()
+        }));
+
+        const tasks = headers
+            .filter(header => header.index > 0 && header.label !== 'Avg.')
+            .map(header => ({
+                key: prefix + '-' + header.label,
+                label: header.label,
+                fullLabel: prefix + ': ' + header.label,
+                columnIndex: header.index
+            }));
+
+        const rows = Array.from(table.querySelectorAll('tbody tr')).map(row => {
+            const cells = row.querySelectorAll('td');
+            if (!cells.length) return null;
+
+            const name = getTableModelName(cells[0]);
+            const values = {};
+            tasks.forEach(task => {
+                const rawValue = cells[task.columnIndex].textContent.trim();
+                values[task.key] = rawValue === '-' ? null : parseFloat(rawValue);
+            });
+
+            const avgCell = Array.from(headers).find(header => header.label === 'Avg.');
+            const avgRaw = avgCell ? cells[avgCell.index].textContent.trim() : null;
+
+            return {
+                name: name,
+                type: getModelType(cells[0], name),
+                values: values,
+                avg: avgRaw === '-' ? null : parseFloat(avgRaw)
+            };
+        }).filter(Boolean);
+
+        return { tasks: tasks, rows: rows };
+    }
+
+    function buildVisualizationData() {
+        const abstractive = parseLeaderboardTable('abstractive-leaderboard', 'Abs');
+        const extractive = parseLeaderboardTable('extractive-leaderboard', 'Ext');
+        const modelMap = new Map();
+
+        abstractive.rows.forEach(row => {
+            modelMap.set(row.name, {
+                name: row.name,
+                type: row.type,
+                abstractiveAvg: row.avg,
+                extractiveAvg: null,
+                tasks: Object.assign({}, row.values)
+            });
+        });
+
+        extractive.rows.forEach(row => {
+            const existing = modelMap.get(row.name) || {
+                name: row.name,
+                type: row.type,
+                abstractiveAvg: null,
+                extractiveAvg: null,
+                tasks: {}
+            };
+            existing.extractiveAvg = row.avg;
+            existing.type = existing.type || row.type;
+            existing.tasks = Object.assign(existing.tasks, row.values);
+            modelMap.set(row.name, existing);
+        });
+
+        const models = Array.from(modelMap.values())
+            .filter(model => model.type !== 'random' && model.type !== 'human')
+            .sort(compareModelEntries);
+        const allTasks = abstractive.tasks.concat(extractive.tasks);
+        return { models: models, tasks: allTasks };
+    }
+
+    function formatTaskValue(value) {
+        return value == null || isNaN(value) ? 'N/A' : value.toFixed(1);
+    }
+
+    function buildModelTooltipHtml(model, tasks, seriesLabel, score) {
+        const abstractiveTasks = tasks.filter(task => task.key.indexOf('Abs-') === 0);
+        const extractiveTasks = tasks.filter(task => task.key.indexOf('Ext-') === 0);
+        const visibleTasks = seriesLabel === 'Abstractive' ? abstractiveTasks : extractiveTasks;
+        const sectionTitle = seriesLabel === 'Abstractive' ? 'Abstractive Tasks' : 'Extractive Tasks';
+
+        function buildTaskSection(title, items) {
+            const lines = items.map(task =>
+                '<div>' + task.label + ': ' + formatTaskValue(model.tasks[task.key]) + '</div>'
+            ).join('');
+
+            return '<div style="margin-top:6px;"><div style="font-weight:700; color:#bfdbfe; margin-bottom:2px;">' +
+                title +
+                '</div>' +
+                lines +
+                '</div>';
+        }
+
+        return '<strong>' + model.name + '</strong><br>' +
+            seriesLabel + ' Avg.: ' + formatTaskValue(score) +
+            '<div style="margin-top:8px; border-top:1px solid rgba(255,255,255,0.18); padding-top:8px;">' +
+            buildTaskSection(sectionTitle, visibleTasks) +
+            '</div>';
+    }
+
+    function renderAverageComparison(models, tasks) {
+        const svg = d3.select('#avg-comparison-chart');
+        if (svg.empty()) return;
+
+        const container = svg.node().parentNode;
+        const containerWidth = container ? container.getBoundingClientRect().width : 1040;
+
+        const margin = { top: 20, right: 30, bottom: 46, left: 180 };
+        const rowBand = 40;
+        const height = margin.top + margin.bottom + models.length * rowBand + 20;
+        const width = Math.max(920, Math.floor(containerWidth));
+        const innerWidth = width - margin.left - margin.right;
+        const innerHeight = height - margin.top - margin.bottom;
+
+        svg.attr('viewBox', '0 0 ' + width + ' ' + height)
+           .attr('width', '100%')
+           .attr('height', height);
+        svg.selectAll('*').remove();
+
+        const g = svg.append('g').attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
+        const x = d3.scaleLinear().domain([0, 80]).range([0, innerWidth]);
+        const y = d3.scaleBand().domain(models.map(model => model.name)).range([0, innerHeight]).padding(0.12);
+        const subY = d3.scaleBand().domain(['Abstractive', 'Extractive']).range([0, y.bandwidth()]).paddingInner(0.04).paddingOuter(0);
+
+        g.append('g')
+            .call(d3.axisLeft(y).tickSize(0))
+            .call(axis => axis.select('.domain').remove())
+            .call(axis => axis.selectAll('text').style('font-size', '12px').style('fill', '#334155'));
+
+        g.append('g')
+            .selectAll('line')
+            .data(x.ticks(5))
+            .enter()
+            .append('line')
+            .attr('x1', d => x(d))
+            .attr('x2', d => x(d))
+            .attr('y1', 0)
+            .attr('y2', innerHeight)
+            .attr('stroke', '#eef2f7')
+            .attr('stroke-width', 1);
+
+        g.append('g')
+            .attr('transform', 'translate(0,' + innerHeight + ')')
+            .call(d3.axisBottom(x).ticks(5))
+            .call(axis => axis.select('.domain').attr('stroke', '#cbd5e1'))
+            .call(axis => axis.selectAll('.tick line').attr('stroke', '#e2e8f0'))
+            .call(axis => axis.selectAll('text').style('font-size', '12px').style('fill', '#475569'));
+
+        const series = [
+            { key: 'abstractiveAvg', label: 'Abstractive', color: '#2563eb' },
+            { key: 'extractiveAvg', label: 'Extractive', color: '#14b8a6' }
+        ];
+
+        const tooltip = d3.select('body').selectAll('.viz-tooltip').data([null]).join('div').attr('class', 'viz-tooltip');
+
+        const groups = g.selectAll('.avg-row-group')
+            .data(models)
+            .enter()
+            .append('g')
+            .attr('transform', d => 'translate(0,' + y(d.name) + ')');
+
+        series.forEach(seriesItem => {
+            groups.append('rect')
+                .attr('x', 0)
+                .attr('y', () => subY(seriesItem.label))
+                .attr('width', d => x(d[seriesItem.key] || 0))
+                .attr('height', subY.bandwidth())
+                .attr('rx', 6)
+                .attr('fill', seriesItem.color)
+                .attr('opacity', d => d[seriesItem.key] == null ? 0.18 : 0.95)
+                .on('mousemove', function (d) {
+                    const score = d[seriesItem.key];
+                    const event = d3.event;
+                    tooltip
+                        .style('opacity', 1)
+                        .style('transform', 'translateY(0)')
+                        .style('left', (event.pageX + 14) + 'px')
+                        .style('top', (event.pageY - 20) + 'px')
+                        .html(buildModelTooltipHtml(d, tasks, seriesItem.label, score));
+                })
+                .on('mouseleave', function () {
+                    tooltip.style('opacity', 0).style('transform', 'translateY(6px)');
+                });
+        });
+    }
+
+    function renderTaskHeatmap(models, tasks) {
+        const svg = d3.select('#task-heatmap-chart');
+        if (svg.empty()) return;
+
+        const cellWidth = 58;
+        const cellHeight = 38;
+        const margin = { top: 118, right: 110, bottom: 18, left: 180 };
+        const width = margin.left + margin.right + models.length * cellWidth;
+        const height = margin.top + margin.bottom + tasks.length * cellHeight;
+
+        svg.attr('viewBox', '0 0 ' + width + ' ' + height)
+           .attr('width', '100%')
+           .attr('height', height);
+        svg.selectAll('*').remove();
+
+        const g = svg.append('g').attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
+        const x = d3.scaleBand().domain(models.map(model => model.name)).range([0, models.length * cellWidth]).paddingInner(0.08);
+        const y = d3.scaleBand().domain(tasks.map(task => task.key)).range([0, tasks.length * cellHeight]).paddingInner(0.08);
+        const color = d3.scaleLinear().domain([0, 50, 100]).range(['#eef2ff', '#93c5fd', '#1d4ed8']);
+
+        const tooltip = d3.select('body').selectAll('.viz-tooltip').data([null]).join('div').attr('class', 'viz-tooltip');
+
+        g.selectAll('.heatmap-column-label')
+            .data(models)
+            .enter()
+            .append('text')
+            .attr('x', 0)
+            .attr('y', 0)
+            .attr('text-anchor', 'start')
+            .attr('transform', d => 'translate(' + (x(d.name) + x.bandwidth() / 2) + ',-12) rotate(-35)')
+            .style('font-size', '11px')
+            .style('font-weight', '700')
+            .style('fill', '#334155')
+            .text(d => d.name);
+
+        g.selectAll('.heatmap-row-label')
+            .data(tasks)
+            .enter()
+            .append('text')
+            .attr('x', -14)
+            .attr('y', d => y(d.key) + y.bandwidth() / 2 + 4)
+            .attr('text-anchor', 'end')
+            .style('font-size', '12px')
+            .style('fill', '#334155')
+            .text(d => d.fullLabel);
+
+        const heatmapData = [];
+        models.forEach(model => {
+            tasks.forEach(task => {
+                heatmapData.push({
+                    model: model.name,
+                    task: task.key,
+                    label: task.fullLabel,
+                    value: model.tasks[task.key]
+                });
+            });
+        });
+
+        g.selectAll('.heatmap-cell')
+            .data(heatmapData)
+            .enter()
+            .append('rect')
+            .attr('x', d => x(d.model))
+            .attr('y', d => y(d.task))
+            .attr('width', x.bandwidth())
+            .attr('height', y.bandwidth())
+            .attr('rx', 6)
+            .attr('fill', d => d.value == null ? '#f8fafc' : color(d.value))
+            .attr('stroke', d => d.value == null ? '#e5e7eb' : 'rgba(255,255,255,0.55)')
+            .attr('stroke-width', 1)
+            .on('mousemove', function (d) {
+                const event = d3.event;
+                tooltip
+                    .style('opacity', 1)
+                    .style('transform', 'translateY(0)')
+                    .style('left', (event.pageX + 14) + 'px')
+                    .style('top', (event.pageY - 20) + 'px')
+                    .html('<strong>' + d.model + '</strong><br>' + d.label + ': ' + (d.value == null ? 'N/A' : d.value.toFixed(1)));
+            })
+            .on('mouseleave', function () {
+                tooltip.style('opacity', 0).style('transform', 'translateY(6px)');
+            });
+
+        g.selectAll('.heatmap-value')
+            .data(heatmapData.filter(d => d.value != null))
+            .enter()
+            .append('text')
+            .attr('x', d => x(d.model) + x.bandwidth() / 2)
+            .attr('y', d => y(d.task) + y.bandwidth() / 2 + 4)
+            .attr('text-anchor', 'middle')
+            .style('font-size', '10px')
+            .style('font-weight', '700')
+            .style('fill', d => d.value >= 55 ? '#ffffff' : '#1f2937')
+            .text(d => d.value.toFixed(1));
+    }
+
+    const visualizationData = buildVisualizationData();
+    renderAverageComparison(visualizationData.models, visualizationData.tasks);
+    renderTaskHeatmap(visualizationData.models, visualizationData.tasks);
+
+    const copyBibtexButton = document.getElementById('copy-bibtex-button');
+    const bibtexBlock = document.getElementById('bibtex-block');
+    if (copyBibtexButton && bibtexBlock && navigator.clipboard) {
+        copyBibtexButton.addEventListener('click', async function () {
+            try {
+                await navigator.clipboard.writeText(bibtexBlock.textContent);
+                const originalText = copyBibtexButton.textContent;
+                copyBibtexButton.textContent = 'Copied!';
+                window.setTimeout(function () {
+                    copyBibtexButton.textContent = originalText;
+                }, 1400);
+            } catch (error) {
+                copyBibtexButton.textContent = 'Failed';
+                window.setTimeout(function () {
+                    copyBibtexButton.textContent = 'Copy';
+                }, 1400);
+            }
+        });
+    }
+});
+</script>
+
+    </body>
+</html>
