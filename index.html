@@ -175,7 +175,7 @@
         }
 
         .leaderboard-viz {
-            width: 80%;
+            width: 48%;
             margin: 0 auto 16px auto;
             font-family: 'Segoe UI', Arial, sans-serif;
         }
@@ -225,7 +225,7 @@
         }
 
         .viz-gradient {
-            width: 180px;
+            width: 108px;
             height: 10px;
             border-radius: 999px;
             background: linear-gradient(90deg, #eef2ff 0%, #93c5fd 45%, #2563eb 100%);
@@ -240,7 +240,7 @@
             border-radius: 10px;
             font-size: 0.86rem;
             line-height: 1.45;
-            max-width: 320px;
+            max-width: 192px;
             box-shadow: 0 10px 28px rgba(15, 23, 42, 0.22);
             opacity: 0;
             transform: translateY(6px);
@@ -321,29 +321,29 @@
             }
             
             .leaderboard-table {
-                width: 1300px; /* Fixed width to ensure horizontal scrolling */
+                width: 780px; /* Fixed width to ensure horizontal scrolling */
                 margin-left: 0;
                 font-size: 12px;
-                min-width: 1300px;
+                min-width: 780px;
             }
             
             .leaderboard-table th,
             .leaderboard-table td {
                 padding: 8px;
                 white-space: nowrap;
-                min-width: 80px;
+                min-width: 48px;
             }
             
             .leaderboard-table td:first-child {
-                min-width: 180px;
-                max-width: 180px;
+                min-width: 108px;
+                max-width: 108px;
                 overflow: hidden;
                 text-overflow: ellipsis;
                 padding-left: 12px;
             }
 
             .leaderboard-viz {
-                width: 92%;
+                width: 55.2%;
             }
 
             /* Add scroll hint for mobile users */
@@ -386,13 +386,16 @@
                             <p style="margin: 6px 0 0 0; font-size: 0.88em; opacity: 0.8; font-style: italic;">
                                 * This work was done while interning at KAIST. &ensp; &dagger; Corresponding Author
                             </p> -->
-                            <p style="margin: 14px 0 0 0; text-align: center;">
+                            <!-- <p style="margin: 14px 0 0 0; text-align: center;">
                                 <span style="display: inline-block; font-size: 1.1em; font-weight: bold; color: #5a4200; letter-spacing: 0.05em; background-color: #ffe099; border-radius: 12px; padding: 6px 24px;">
                                     Preprint
                                 </span>
-                            </p>
+                            </p> -->
                         </div>
                     
+                        <p style="width: 75%; margin: 0 auto 20px auto; text-align: left; color: #e6f4ff; font-size: 1.2rem; line-height: 1.7; font-family: 'Source Sans 3', 'Helvetica Neue', Arial, sans-serif;">
+                            <strong>Overview.</strong> <strong style="color: #ffffff;">VAEX-Bench</strong> is a benchmark for evaluating abstractive spatiotemporal reasoning in Large Multimodal Models (LMMs) using high-fidelity egocentric videos rendered from manually constructed 3D indoor environments. We design each episode as a controllable scenario in Trimble SketchUp and render photorealistic views with Chaos Enscape, enabling strict spatial consistency and unambiguous ground truth. <strong style="color: #ffffff;">VAEX-Bench</strong> decomposes beyond-the-visible reasoning into five tasks—Memory-Action, Map Direction, Map Scale, Simulation, and Global Counting—which jointly test long-horizon memory, allocentric map construction (direction and distance), viewpoint transformation, and global aggregation under partial observability. All QA pairs are human-authored and verified, and we provide task-specific error analyses to diagnose failure modes, revealing where current models break down when they must integrate dispersed cues across time and space rather than rely on frame-local evidence.
+                        </p>
                     
                         <div class="l-body">
                             <!-- Scenario Buttons -->
@@ -543,7 +546,7 @@
         </div>
         <div id="leaderboard-visualization" class="leaderboard-viz" style="margin-top: 48px;">
             <div style="font-size: 1.8em; font-weight: 900; text-align: center; color: #000; margin: 12px 0 16px 0; letter-spacing: 0.04em; font-family: 'Segoe UI', Arial, sans-serif;">Leaderboard Visualization</div>
-            <p style="text-align: left; color: #5b6572; font-size: 1rem; line-height: 1.7; margin: 0 auto 22px auto; max-width: 860px; font-family: 'Source Sans 3', 'Helvetica Neue', Arial, sans-serif;">
+            <p style="text-align: left; color: #5b6572; font-size: 1.2rem; line-height: 1.7; margin: 0 auto 22px auto; width: 100%; max-width: none; font-family: 'Source Sans 3', 'Helvetica Neue', Arial, sans-serif;">
                 We visualize model performance across all 10 tasks from abstractive and extractive reasoning to make cross-model strengths and weaknesses easier to compare at a glance.
             </p>
             <div class="leaderboard-viz-grid">
@@ -572,10 +575,10 @@
                 </div>
             </div>
         </div>
-        <div class="overview-box" style="margin-top: 48px;">
+        <div class="overview-box" style="width: 48%; margin: 48px auto 0 auto;">
             <div class="overview-title" style="font-size: 1.8em; font-weight: 900; text-align: center; color: #000; margin-bottom: 16px; letter-spacing: 0.04em; font-family: 'Segoe UI', Arial, sans-serif;">Overview</div>
             <d-figure id="fig-teaser" layout="l-page">
-                <figure>
+                <figure style="width: 100%; margin: 0 auto;">
                     <img data-zoomable="" draggable="false" src="static/img/teaser.png" alt="Visual-Spatial Intelligence Teaser" style="width: 100%; max-width: 100%; display: block;">
                     <figcaption>
                         <strong>Figure 1:</strong> Two examples of abstractive spatiotemporal queries from VAEX-BENCH: (Left) Global Counting, requiring aggregation of objects observed across the traversal; (Right) Map Direction, requiring inference of relative spatial directions between rooms.
@@ -596,7 +599,7 @@
         </p>
         
         <div style="font-size: 1.8em; font-weight: 900; text-align: center; color: #000; margin: 36px 0 16px 0; letter-spacing: 0.04em; font-family: 'Segoe UI', Arial, sans-serif;">Key Points</div>
-        <div class="key-points-wrap" style="width: 80%; margin: 0 auto 28px auto;">
+        <div class="key-points-wrap" style="width: 48%; margin: 0 auto 28px auto;">
             <div class="key-points-box" style="border: 2px solid #b0c8e0; border-radius: 18px; background-color: #f5f9fd; padding: 18px 22px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06); box-sizing: border-box;">
                 <ul style="margin: 0; padding-left: 22px; width: 100%; font-size: 1.2rem; line-height: 1.6; color: #333333;">
                     <li>We introduce VAEX-Bench, a scenario-driven synthetic dataset and taxonomy for abstractive spatiotemporal reasoning from videos.</li>
@@ -609,7 +612,7 @@
         <!-- <div style="font-size: 1.8em; font-weight: 900; text-align: center; color: #000; margin: 36px 0 16px 0; letter-spacing: 0.04em; font-family: 'Segoe UI', Arial, sans-serif;">VAEX-BENCH</div> -->
 
         <div style="font-size: 1.8em; font-weight: 900; text-align: center; color: #000; margin: 36px 0 16px 0; letter-spacing: 0.04em; font-family: 'Segoe UI', Arial, sans-serif;">Evaluation</div>
-        <div id="vsi-leaderboard" class="leaderboard-container" style="width: 80%; margin: 0 auto 48px auto;">
+        <div id="vsi-leaderboard" class="leaderboard-container" style="width: 48%; margin: 0 auto 48px auto;">
             <div style="font-size: 1.15rem; font-weight: 800; color: #1f2937; margin: 0 0 12px 0; text-align: left; font-family: 'Segoe UI', Arial, sans-serif;">Abstractive Reasoning Evaluation</div>
             <!-- <p style="text-align: center; color: #5b6572; font-size: 1.02rem; line-height: 1.6; margin: 0 auto 20px auto; max-width: 760px; font-family: 'Source Sans 3', 'Helvetica Neue', Arial, sans-serif;">
                 Quantitative results on VAEX-BENCH across representative open and proprietary MLLMs.
@@ -960,14 +963,14 @@
         </div>
 
         <div style="font-size: 1.8em; font-weight: 900; text-align: center; color: #000; margin: 36px 0 16px 0; letter-spacing: 0.04em; font-family: 'Segoe UI', Arial, sans-serif;">Detailed Analysis</div>
-        <div style="width: 80%; margin: 0 auto; font-family: 'Segoe UI', Arial, sans-serif; line-height: 1.6;">
+        <div style="width: 48%; margin: 0 auto; font-family: 'Segoe UI', Arial, sans-serif; line-height: 1.6;">
 
             <div style="margin-bottom: 60px;">
                 <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
                     <span style="background: #000; color: #fff; padding: 2px 8px; font-size: 0.8em; font-weight: 900; border-radius: 3px;">01</span>
                     <h3 style="margin: 0; font-size: 1.4em; color: #000; letter-spacing: -0.01em;">Perceptual Bottleneck</h3>
                 </div>
-                <p style="color: #444; font-size: 1.05em; margin-bottom: 20px;">
+                <p style="color: #444; font-size: 1.2rem; margin-bottom: 20px;">
                     We analyze failures on 
                     <span style="display: inline-block; background-color: #f0f0f0; color: #2e6da4; padding: 2px 10px; border-radius: 10px; font-weight: 700; border: 1px solid #ddd; margin: 0 4px; vertical-align: middle;">
                         Global Counting
@@ -980,7 +983,7 @@
                         <span style="font-weight: 900; color: #000; margin-right: 15px; font-size: 1.1em;">01.</span>
                         <div>
                             <strong style="display: block; font-size: 1.1em; color: #000; margin-bottom: 4px;">Omission Error</strong>
-                            <span style="color: #666; font-size: 0.95em;">An error in which an object that is actually present in the scenario is incorrectly judged as absent and therefore not counted.</span>
+                            <span style="color: #666; font-size: 1rem;">An error in which an object that is actually present in the scenario is incorrectly judged as absent and therefore not counted.</span>
                         </div>
                     </div>
                 
@@ -988,7 +991,7 @@
                         <span style="font-weight: 900; color: #000; margin-right: 15px; font-size: 1.1em;">02.</span>
                         <div>
                             <strong style="display: block; font-size: 1.1em; color: #000; margin-bottom: 4px;">Hallucination Error</strong>
-                            <span style="color: #666; font-size: 0.95em;">An error in which an object that does not actually exist in the scenario is incorrectly judged to be present and is therefore included in the count.</span>
+                            <span style="color: #666; font-size: 1rem;">An error in which an object that does not actually exist in the scenario is incorrectly judged to be present and is therefore included in the count.</span>
                         </div>
                     </div>
                 
@@ -996,14 +999,14 @@
                         <span style="font-weight: 900; color: #000; margin-right: 15px; font-size: 1.1em;">03.</span>
                         <div>
                             <strong style="display: block; font-size: 1.1em; color: #000; margin-bottom: 4px;">Miscounting Error</strong>
-                            <span style="color: #666; font-size: 0.95em;">An error in which an object is correclty recognized as being present in the scenario, but the number assigned to that object is incorrect.</span>
+                            <span style="color: #666; font-size: 1rem;">An error in which an object is correclty recognized as being present in the scenario, but the number assigned to that object is incorrect.</span>
                         </div>
                     </div>
                 
                 </div>
 
                 </p>
-                <figure style="width: 70%; margin: 20px auto; background: #f9f9f9; border: 1px solid #eee; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.03);">
+                <figure style="width: 54%; margin: 20px auto; background: #f9f9f9; border: 1px solid #eee; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.03);">
                     <img src="static/img/perceptual.jpg" alt="Bottleneck Analysis 1" style="width: 100%; display: block;">
                     
                     <figcaption style="padding: 15px; text-align: center; font-size: 16px; color: #666; font-family: 'Inter', sans-serif; line-height: 1.5; border-top: 1px solid #eee; background: #fff;">
@@ -1019,7 +1022,7 @@
                     <span style="background: #000; color: #fff; padding: 2px 8px; font-size: 0.8em; font-weight: 900; border-radius: 3px;">02</span>
                     <h3 style="margin: 0; font-size: 1.4em; color: #000; letter-spacing: -0.01em;">Temporal Bottleneck</h3>
                 </div>
-                <p style="color: #444; font-size: 1.05em; margin-bottom: 20px;">
+                <p style="color: #444; font-size: 1.2rem; margin-bottom: 20px;">
                     We analyze failures on 
                     <span style="display: inline-block; background-color: #f0f0f0; color: #2e6da4; padding: 2px 10px; border-radius: 10px; font-weight: 700; border: 1px solid #ddd; margin: 0 4px; vertical-align: middle;">
                         Memory-Action
@@ -1030,21 +1033,21 @@
 
                 <div style="display: flex; justify-content: center; gap: 30px; margin-bottom: 40px; font-family: 'Inter', sans-serif;">
     
-                    <div style="flex: 1; max-width: 300px; text-align: center;">
+                    <div style="flex: 1; max-width: 270px; text-align: center;">
                         <div style="padding: 12px; background: #eef2ff; color: #4338ca; border: 1px solid #c7d2fe; border-radius: 10px; font-weight: 700; margin-bottom: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
                             Global Temporal Memory <span style="font-size: 0.8em; opacity: 0.7;">(Hop 1)</span>
                         </div>
-                        <div style="font-size: 0.9em; line-height: 1.5; color: #555;">
+                        <div style="font-size: 1rem; line-height: 1.5; color: #555;">
                             <div style="margin-bottom: 4px;"><span style="color: #059669; font-weight: 700;">● Pass:</span> Recalls the full trajectory.</div>
                             <div><span style="color: #dc2626; font-weight: 700;">● Fail:</span> Forgets the sequence of rooms.</div>
                         </div>
                     </div>
                 
-                    <div style="flex: 1; max-width: 300px; text-align: center;">
+                    <div style="flex: 1; max-width: 270px; text-align: center;">
                         <div style="padding: 12px; background: #f0fdf4; color: #15803d; border: 1px solid #bbf7d0; border-radius: 10px; font-weight: 700; margin-bottom: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
                             Local Temporal Memory <span style="font-size: 0.8em; opacity: 0.7;">(Hop 2)</span>
                         </div>
-                        <div style="font-size: 0.9em; line-height: 1.5; color: #555;">
+                        <div style="font-size: 1rem; line-height: 1.5; color: #555;">
                             <div style="margin-bottom: 4px;"><span style="color: #059669; font-weight: 700;">● Pass:</span> Matches action to target.</div>
                             <div><span style="color: #dc2626; font-weight: 700;">● Fail:</span> Fails to link memory to action.</div>
                         </div>
@@ -1052,11 +1055,11 @@
                 
                 </div>
 
-                <figure style="width: 70%; margin: 20px auto; background: #f9f9f9; border: 1px solid #eee; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.03);">
+                <figure style="width: 54%; margin: 20px auto; background: #f9f9f9; border: 1px solid #eee; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.03);">
                     <img src="static/img/temporal.jpg" alt="Bottleneck Analysis 1" style="width: 100%; display: block;">
                     
                     <figcaption style="padding: 15px; text-align: center; font-size: 16px; color: #666; font-family: 'Inter', sans-serif; line-height: 1.5; border-top: 1px solid #eee; background: #fff;">
-                        <strong style="color: #333;">Figure 3.</strong> 
+                        <strong style="color: #333;">Figure 3.</strong> Temporal bottleneck in multi-hop sub-tasks.
                     </figcaption>
                 </figure>
             </div>
@@ -1068,7 +1071,7 @@
                     <span style="background: #000; color: #fff; padding: 2px 8px; font-size: 0.8em; font-weight: 900; border-radius: 3px;">03</span>
                     <h3 style="margin: 0; font-size: 1.4em; color: #000; letter-spacing: -0.01em;">Spatial Bottleneck</h3>
                 </div>
-                <p style="color: #444; font-size: 1.05em; margin-bottom: 20px;">
+                <p style="color: #444; font-size: 1.2rem; margin-bottom: 20px;">
                     We analyze failures on 
                     <span style="display: inline-block; background-color: #f0f0f0; color: #2e6da4; padding: 2px 10px; border-radius: 10px; font-weight: 700; border: 1px solid #ddd; margin: 0 4px; vertical-align: middle;">
                         Map Direction
@@ -1083,7 +1086,7 @@
                     Models must reason about relative room orientation, maintain consistent metric proportions, and simulate viewpoint transformations within a unified layout.
                     To diagnose these spatial bottlenecks, we evaluate the MLLMs to explicitly reconstruct a global cognitive map via grid-based floor-plan prediciton.
                 </p>
-                <figure style="width: 70%; margin: 20px auto; background: #f9f9f9; border: 1px solid #eee; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.03);">
+                <figure style="width: 54%; margin: 20px auto; background: #f9f9f9; border: 1px solid #eee; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.03);">
                     <img src="static/img/spatial.jpg" alt="Bottleneck Analysis 1" style="width: 100%; display: block;">
                     
                     <figcaption style="padding: 15px; text-align: center; font-size: 16px; color: #666; font-family: 'Inter', sans-serif; line-height: 1.5; border-top: 1px solid #eee; background: #fff;">
@@ -1105,7 +1108,7 @@
             Future work will focus on automating the pipeline to scale benchmark generation while preserving its controllability.
             <br>
         </p>
-        <div style="width: 80%; margin: 28px auto 0 auto; text-align: left; font-family: 'Segoe UI', Arial, sans-serif;">
+        <div style="width: 48%; margin: 72px auto 72px auto; text-align: left; font-family: 'Segoe UI', Arial, sans-serif;">
             <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 10px;">
                 <div style="font-size: 1.2rem; font-weight: 800; color: #1f2937;">BibTeX</div>
                 <button id="copy-bibtex-button" type="button" style="border: 1px solid #cbd5e1; background: #ffffff; color: #334155; border-radius: 999px; padding: 7px 14px; font-size: 0.9rem; font-weight: 700; cursor: pointer;">Copy</button>
@@ -1435,12 +1438,12 @@ document.addEventListener('DOMContentLoaded', function () {
         if (svg.empty()) return;
 
         const container = svg.node().parentNode;
-        const containerWidth = container ? container.getBoundingClientRect().width : 1040;
+        const containerWidth = container ? container.getBoundingClientRect().width : 624;
 
-        const margin = { top: 20, right: 30, bottom: 46, left: 180 };
+        const margin = { top: 20, right: 18, bottom: 46, left: 108 };
         const rowBand = 40;
         const height = margin.top + margin.bottom + models.length * rowBand + 20;
-        const width = Math.max(920, Math.floor(containerWidth));
+        const width = Math.max(552, Math.floor(containerWidth));
         const innerWidth = width - margin.left - margin.right;
         const innerHeight = height - margin.top - margin.bottom;
 
@@ -1520,9 +1523,9 @@ document.addEventListener('DOMContentLoaded', function () {
         const svg = d3.select('#task-heatmap-chart');
         if (svg.empty()) return;
 
-        const cellWidth = 58;
+        const cellWidth = 35;
         const cellHeight = 38;
-        const margin = { top: 118, right: 110, bottom: 18, left: 180 };
+        const margin = { top: 118, right: 66, bottom: 18, left: 108 };
         const width = margin.left + margin.right + models.length * cellWidth;
         const height = margin.top + margin.bottom + tasks.length * cellHeight;
 
